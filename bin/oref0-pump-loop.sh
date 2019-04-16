@@ -86,7 +86,7 @@ main() {
             cat /tmp/oref0-updates.txt 2>&3
             touch /tmp/pump_loop_success
             echo Completed oref0-pump-loop at $(date)
-            update_display
+            #update_display
             echo
         else
             # pump-loop errored out for some reason
