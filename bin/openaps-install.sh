@@ -21,16 +21,24 @@ if [ -e /run/sshwarn ] ; then
     passwd pi
 fi
 
-grep "PermitRootLogin yes" /etc/ssh/sshd_config || echo "PermitRootLogin yes" > /etc/ssh/sshd_config
-
 # set timezone
 dpkg-reconfigure tzdata
+
+# Workaround for Jubilinux v0.2.0 (Debian Jessie) migration to LTS
+if cat /etc/os-release | grep 'PRETTY_NAME="Debian GNU/Linux 8 (jessie)"' &> /dev/null; then
+    # Disable valid-until check for archived Debian repos (expired certs)
+    echo "Acquire::Check-Valid-Until false;" | tee -a /etc/apt/apt.conf.d/10-nocheckvalid
+    # Replace apt sources.list with archive.debian.org locations
+    echo -e "deb http://security.debian.org/ jessie/updates main\n#deb-src http://security.debian.org/ jessie/updates main\n\ndeb http://archive.debian.org/debian/ jessie-backports main\n#deb-src http://archive.debian.org/debian/ jessie-backports main\n\ndeb http://archive.debian.org/debian/ jessie main contrib non-free\n#deb-src http://archive.debian.org/debian/ jessie main contrib non-free" > /etc/apt/sources.list
+fi
 
 #dpkg -P nodejs nodejs-dev
 # TODO: remove the `-o Acquire::ForceIPv4=true` once Debian's mirrors work reliably over IPv6
 apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true -y dist-upgrade && apt-get -o Acquire::ForceIPv4=true -y autoremove
 apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install -y sudo strace tcpdump screen acpid vim python-pip locate ntpdate ntp
 #check if edison user exists before trying to add it to groups
+
+grep "PermitRootLogin yes" /etc/ssh/sshd_config || echo "PermitRootLogin yes" > /etc/ssh/sshd_config
 
 if  getent passwd edison > /dev/null; then
   echo "Adding edison to sudo users"
