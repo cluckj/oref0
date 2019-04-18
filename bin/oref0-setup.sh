@@ -1398,7 +1398,7 @@ if prompt_yn "" N; then
             "cd $directory && oref0-cron-post-reboot"
         add_to_crontab \
             "oref0-cron-nightly" \
-            "5 4 * * *" \
+            "5 6 * * *" \
             "cd $directory && oref0-cron-nightly"
         add_to_crontab \
             "oref0-cron-every-15min" \
