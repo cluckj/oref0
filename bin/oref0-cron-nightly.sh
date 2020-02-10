@@ -17,7 +17,7 @@ NIGHTSCOUT_HOST="$(get_pref_string .nightscout_host)"
 directory="$PWD"
 
 if [[ $ENABLE =~ autotune ]]; then
-    # autotune nightly at 4:05am using data from NS
+    # autotune nightly at 6:05am using data from NS
     echo "=== Running Autotune at `date` === " | tee -a /var/log/openaps/autotune.log
     (oref0-autotune -d=$directory -n=$NIGHTSCOUT_HOST && \
         cat $directory/autotune/profile.json | jq . | grep -q start && \

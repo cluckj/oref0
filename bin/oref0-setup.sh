@@ -646,7 +646,7 @@ if prompt_yn "" N; then
         # Replace apt sources.list with archive.debian.org locations
         echo -e "deb http://security.debian.org/ jessie/updates main\n#deb-src http://security.debian.org/ jessie/updates main\n\ndeb http://archive.debian.org/debian/ jessie-backports main\n#deb-src http://archive.debian.org/debian/ jessie-backports main\n\ndeb http://archive.debian.org/debian/ jessie main contrib non-free\n#deb-src http://archive.debian.org/debian/ jessie main contrib non-free" > /etc/apt/sources.list
     fi
-    
+
     #Mount the Edison's fat32 partition at /usr/local/go to give us lots of room to install golang
     if is_edison && [ -e /dev/mmcblk0p9 ] && ! mount | grep -qa mmcblk0p9 ; then
         echo 'Removing golang from /usr partition...' && rm -rf /usr/local/go && mkdir -p /usr/local/go
@@ -655,7 +655,7 @@ if prompt_yn "" N; then
         fi
         echo 'Mounting Edison FAT32 partition...' && mount -a
     fi
-    
+
     #TODO: remove this when IPv6 works reliably
     echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
 
@@ -734,6 +734,13 @@ if prompt_yn "" N; then
     else
         echo -n "Cloning oref0: "
         (cd $HOME/src && git clone git://github.com/openaps/oref0.git) || die "Couldn't clone oref0"
+    fi
+
+    # install/upgrade to latest node 8 if neither node 8 nor node 10+ LTS are installed
+    if ! nodejs --version | grep -e 'v8\.' -e 'v1[02468]\.' ; then
+        echo Upgrading to node 8
+        sudo bash -c "curl -sL https://deb.nodesource.com/setup_8.x | bash -" || die "Couldn't setup node 8"
+        sudo apt-get install -y nodejs || die "Couldn't install nodejs"
     fi
 
     # Make sure jq version >1.5 is installed
@@ -1251,7 +1258,7 @@ if prompt_yn "" N; then
             "cd $directory && oref0-cron-post-reboot"
         add_to_crontab \
             "oref0-cron-nightly" \
-            "5 4 * * *" \
+            "5 6 * * *" \
             "cd $directory && oref0-cron-nightly"
         add_to_crontab \
             "oref0-cron-every-15min" \

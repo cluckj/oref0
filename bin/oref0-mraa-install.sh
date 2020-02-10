@@ -10,7 +10,6 @@ mkdir -p mraa/build && cd mraa/build && cmake .. -DBUILDSWIGNODE=OFF -DCMAKE_INS
 echo "Running ldconfig..."
 bash -c "grep -q i386-linux-gnu /etc/ld.so.conf || echo /usr/local/lib/i386-linux-gnu/ >> /etc/ld.so.conf && ldconfig"
 echo "MRAA installed. Please reboot before using."
-
 mkdir -p ~/src
 if [ -d "$HOME/src/ccprog/" ]; then
     echo "$HOME/src/ccprog/ already exists; updating"

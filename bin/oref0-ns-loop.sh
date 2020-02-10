@@ -19,10 +19,10 @@ main() {
             get_ns_bg
         fi
         overtemp && exit 1
-        if highload && completed_recently; then
-            echo Load high at $(date): waiting up to 5m to continue
-            exit 2
-        fi
+        #if highload && completed_recently; then
+        #    echo Load high at $(date): waiting up to 5m to continue
+        #    exit 2
+        #fi
     fi
 
     pushover_snooze
