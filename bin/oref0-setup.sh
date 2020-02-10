@@ -317,7 +317,7 @@ if [[ -z "$DIR" || -z "$serial" ]]; then
     echo "G6-upload: will use and upload BGs from a plugged in G5/G6 touchscreen receiver to Nightscout"
     echo "MDT: will use and upload BGs from an Enlite sensor paired to your pump"
     echo "xdrip: will work with an xDrip receiver app on your Android phone"
-    echo "xdrip-js: will work directly with a Dexcom G5 transmitter and will upload to Nightscout"
+    echo "xdrip-js: will work directly with a Dexcom G5/G6 transmitter and will upload to Nightscout"
     echo "Note: no matter which option you choose, CGM data will also be downloaded from NS when available."
     echo
     prompt_and_validate CGM "What kind of CGM would you like to configure?:" validate_cgm
@@ -446,7 +446,7 @@ if [[ -z "$DIR" || -z "$serial" ]]; then
     echo
     if [[ ! -z $NIGHTSCOUT_HOST ]]; then
         echo "Starting with oref 0.5.0 you can use token based authentication to Nightscout. This makes it possible to deny anonymous access to your Nightscout instance. It's more secure than using your API_SECRET, but must first be configured in Nightscout."
-        if prompt_yn "Do you want to use token based authentication?" N; then
+        if prompt_yn "Do you want to use token based authentication? (Enter 'N' to provide your Nightscout secret instead)" N; then
             prompt_and_validate REPLY "What Nightscout access token (i.e. subjectname-hashof16characters) do you want to use for this rig?" validate_nightscout_token
             API_SECRET="token=${REPLY}"
             echocolor "Ok, $API_SECRET it is."
@@ -867,7 +867,7 @@ if prompt_yn "" N; then
     # configure ns
     if [[ ! -z "$NIGHTSCOUT_HOST" && ! -z "$API_SECRET" ]]; then
         echo "Removing any existing ns device: "
-        ( killall -g openaps; killall -g oref0-pump-loop) 2>/dev/null; openaps device remove ns 2>/dev/null
+        ( killall -g openaps; killall-g oref0-pump-loop) 2>/dev/null; openaps device remove ns 2>/dev/null
         echo "Running nightscout autoconfigure-device-crud $NIGHTSCOUT_HOST $API_SECRET"
         nightscout autoconfigure-device-crud $NIGHTSCOUT_HOST $API_SECRET || die "Could not run nightscout autoconfigure-device-crud"
         if [[ "${API_SECRET,,}" =~ "token=" ]]; then # install requirements for token based authentication
@@ -999,6 +999,7 @@ if prompt_yn "" N; then
         cd $HOME/src/Logger            
         sudo apt-get install -y bluez-tools
         sudo npm run global-install
+        cgm-transmitter $DEXCOM_CGM_TX_ID
         touch /tmp/reboot-required
     fi
 
@@ -1057,6 +1058,8 @@ if prompt_yn "" N; then
     do_openaps_import $HOME/src/oref0/lib/oref0-setup/supermicrobolus.json
 
     echo "Adding OpenAPS log shortcuts"
+    # Make sure that .bash_profile exists first, then call script to add the log shortcuts
+    touch "$HOME/.bash_profile"
     oref0-log-shortcuts --add-to-profile="$HOME/.bash_profile"
 
     # Append NIGHTSCOUT_HOST and API_SECRET to $HOME/.bash_profile so that openaps commands can be executed from the command line
@@ -1122,6 +1125,7 @@ if prompt_yn "" N; then
         fi
         systemctl enable pi-buttons && systemctl restart pi-buttons
         echo "Installing openaps-menu..."
+        test "$directory" != "/$HOME/myopenaps" && (echo You are using a non-standard openaps directory. For the statusmenu to work correctly you need to set the openapsDir variable in index.js)
         cd $HOME/src && git clone git://github.com/openaps/openaps-menu.git || (cd openaps-menu && git checkout master && git pull)
         cd $HOME/src/openaps-menu && sudo npm install
         cp $HOME/src/openaps-menu/openaps-menu.service /etc/systemd/system/ && systemctl enable openaps-menu
