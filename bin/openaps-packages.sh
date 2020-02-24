@@ -35,7 +35,7 @@ fi
 
 # upgrade setuptools to avoid "'install_requires' must be a string" error
 sudo pip install setuptools -U # no need to die if this fails
-sudo pip install -U openaps || die "Couldn't install openaps toolkit"
+sudo pip install -U --default-timeout=1000 git+https://github.com/openaps/openaps.git || die "Couldn't install openaps toolkit"
 sudo pip install -U openaps-contrib || die "Couldn't install openaps-contrib"
 sudo openaps-install-udev-rules || die "Couldn't run openaps-install-udev-rules"
 sudo activate-global-python-argcomplete || die "Couldn't run activate-global-python-argcomplete"
